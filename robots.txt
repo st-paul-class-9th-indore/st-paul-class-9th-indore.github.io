@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://st-paul-class-9th-indore.github.io/sitemap.xml
