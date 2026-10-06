@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3D Classroom</title>
+
+<style>
+html, body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    font-family: Arial, sans-serif;
+    background: #111827;
+}
+
+#info {
+    position: fixed;
+    z-index: 10;
+    top: 14px;
+    left: 14px;
+    padding: 12px 16px;
+    color: white;
+    background: rgba(15, 23, 42, .88);
+    border-radius: 10px;
+    box-shadow: 0 5px 20px #0005;
+}
+
+#info b {
+    font-size: 17px;
+}
+
+#date {
+    margin-top: 5px;
+    font-size: 12px;
+    color: #cbd5e1;
+}
+
+#reset {
+    position: fixed;
+    z-index: 10;
+    right: 14px;
+    top: 14px;
+    border: 0;
+    border-radius: 8px;
+    padding: 10px 14px;
+    background: #2563eb;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#reset:hover {
+    background: #1d4ed8;
+}
+
+/* Modal Popup Card */
+#modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.9);
+    background: rgba(15, 23, 42, 0.95);
+    color: white;
+    padding: 24px;
+    border-radius: 14px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    z-index: 100;
+    width: 300px;
+    display: none;
+    opacity: 0;
+    transition: all 0.2s ease-in-out;
+    border: 1px solid #334155;
+}
+
+#modal.active {
+    display: block;
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+#modal h3 {
+    margin-top: 0;
+    font-size: 20px;
+    color: #60a5fa;
+    border-bottom: 1px solid #334155;
+    padding-bottom: 8px;
+}
+
+#modal p {
+    margin: 10px 0;
+    font-size: 14px;
+    color: #e2e8f0;
+}
+
+#modal button {
+    margin-top: 15px;
+    background: #ef4444;
+    border: none;
+    color: white;
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    width: 100%;
+}
+
+#modal button:hover {
+    background: #dc2626;
+}
+
+.instructions {
+    position: fixed;
+    bottom: 14px;
+    left: 14px;
+    background: rgba(15, 23, 42, 0.8);
+    color: #94a3b8;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    pointer-events: none;
+    z-index: 10;
+}
+</style>
+</head>
+
+<body>
+
+<div id="info">
+    <b>3D Classroom</b>
+    <div id="date"></div>
+</div>
+
+<button id="reset">Reset View</button>
+<div class="instructions">Click any desk or chair to inspect student details</div>
+
+<!-- Interactive Modal Card -->
+<div id="modal">
+    <h3 id="modalTitle">Desk Info</h3>
+    <p id="modalDesc">Details will appear here.</p>
+    <button id="closeModal">Close</button>
+</div>
+
+<script type="module">
+
+import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js";
+import { OrbitControls } from "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/controls/OrbitControls.js";
+
+const START_DATE = new Date("2026-04-01"); // Base semester start date
+
+/* =========================================================
+   SCENE
+========================================================= */
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x9db7cc);
+
+/* =========================================================
+   CAMERA
+========================================================= */
+const camera = new THREE.PerspectiveCamera(
+    50,
+    window.innerWidth / window.innerHeight,
+    0.1,
+    300
+);
+camera.position.set(15, 14, 19);
+
+/* =========================================================
+   RENDERER
+========================================================= */
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+document.body.appendChild(renderer.domElement);
+
+/* =========================================================
+   CONTROLS
+========================================================= */
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.target.set(0, 2, 0);
+controls.enableDamping = true;
+controls.dampingFactor = .06;
+controls.minDistance = 8;
+controls.maxDistance = 38;
+controls.maxPolarAngle = Math.PI * .48;
+
+/* =========================================================
+   LIGHTING
+========================================================= */
+const ambient = new THREE.HemisphereLight(0xffffff, 0x6b7280, 2.2);
+scene.add(ambient);
+
+const mainLight = new THREE.DirectionalLight(0xffffff, 3.5);
+mainLight.position.set(-8, 18, 8);
+mainLight.castShadow = true;
+mainLight.shadow.mapSize.set(2048, 2048);
+mainLight.shadow.camera.left = -20;
+mainLight.shadow.camera.right = 20;
+mainLight.shadow.camera.top = 20;
+mainLight.shadow.camera.bottom = -20;
+scene.add(mainLight);
+
+/* =========================================================
+   MATERIALS
+========================================================= */
+const floorMat = new THREE.MeshStandardMaterial({ color: 0xb58b63, roughness: .8 });
+const wallMat = new THREE.MeshStandardMaterial({ color: 0xe8dfd2, roughness: .9 });
+const woodMat = new THREE.MeshStandardMaterial({ color: 0x8b542f, roughness: .65 });
+const woodDarkMat = new THREE.MeshStandardMaterial({ color: 0x5c351f, roughness: .7 });
+const metalMat = new THREE.MeshStandardMaterial({ color: 0x4b5563, metalness: .75, roughness: .3 });
+const glassMat = new THREE.MeshPhysicalMaterial({ color: 0x8ed8f5, transparent: true, opacity: .55, roughness: .1, metalness: .1 });
+const boardFrameMat = new THREE.MeshStandardMaterial({ color: 0x30343b, roughness: .5 });
+const screenMat = new THREE.MeshStandardMaterial({ color: 0x102d43, emissive: 0x071d2d, emissiveIntensity: .7 });
+const doorMat = new THREE.MeshStandardMaterial({ color: 0x704727, roughness: .65 });
+const tagMat = new THREE.MeshStandardMaterial({ color: 0x8c5b38, roughness: .9 });
+
+/* =========================================================
+   HELPER: BOX
+========================================================= */
+function box(w, h, d, material, x=0, y=0, z=0) {
+    const geometry = new THREE.BoxGeometry(w, h, d);
+    const mesh = new THREE.Mesh(geometry, material);
+    mesh.position.set(x, y, z);
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    scene.add(mesh);
+    return mesh;
+}
+
+/* =========================================================
+   FLOOR & ROOM
+========================================================= */
+box(26, .35, 20, floorMat, 0, -.18, 0);
+
+const grid = new THREE.GridHelper(26, 26, 0x7d6247, 0x9b7958);
+grid.position.y = .01;
+scene.add(grid);
+
+const ROOM_W = 26;
+const ROOM_D = 20;
+const WALL_H = 7;
+
+box(ROOM_W, WALL_H, .3, wallMat, 0, WALL_H/2, -ROOM_D/2);
+box(.3, WALL_H, ROOM_D, wallMat, -ROOM_W/2, WALL_H/2, 0);
+box(.3, WALL_H, ROOM_D, wallMat, ROOM_W/2, WALL_H/2, 0);
+
+/* =========================================================
+   SMARTBOARD
+========================================================= */
+function createSmartBoard(){
+    const group = new THREE.Group();
+    group.position.set(0, 4.6, -9.72);
+    scene.add(group);
+
+    const outer = new THREE.Mesh(new THREE.BoxGeometry(10.5, 3.8, .35), boardFrameMat);
+    outer.castShadow = true;
+    group.add(outer);
+
+    const screen = new THREE.Mesh(new THREE.BoxGeometry(9.6, 2.9, .12), screenMat);
+    screen.position.z = .23;
+    group.add(screen);
+
+    const tray = new THREE.Mesh(new THREE.BoxGeometry(10.8, .18, .45), boardFrameMat);
+    tray.position.set(0, -1.95, .05);
+    group.add(tray);
+}
+createSmartBoard();
+
+/* =========================================================
+   WINDOWS & DOORS
+========================================================= */
+function createWindow(x, z, rotationY){
+    const group = new THREE.Group();
+    group.position.set(x, 4, z);
+    group.rotation.y = rotationY;
+    scene.add(group);
+
+    const frame = new THREE.Mesh(new THREE.BoxGeometry(4.0, 2.6, .28), woodDarkMat);
+    group.add(frame);
+
+    const glass = new THREE.Mesh(new THREE.BoxGeometry(3.55, 2.15, .08), glassMat);
+    glass.position.z = .17;
+    group.add(glass);
+}
+
+createWindow(-12.75, -4, Math.PI/2);
+createWindow(-12.75, 4, Math.PI/2);
+createWindow(12.75, -4, -Math.PI/2);
+createWindow(12.75, 4, -Math.PI/2);
+
+function createDoor(z){
+    const group = new THREE.Group();
+    group.position.set(12.72, 2.65, z);
+    group.rotation.y = -Math.PI/2;
+    scene.add(group);
+
+    const door = new THREE.Mesh(new THREE.BoxGeometry(2.6, 5.3, .25), doorMat);
+    door.castShadow = true;
+    group.add(door);
+}
+createDoor(-4.8);
+createDoor(4.8);
+
+/* =========================================================
+   INTERACTION & RAYCASTING (MODAL)
+========================================================= */
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+const interactiveObjects = [];
+
+window.addEventListener("click", (event) => {
+    // Prevent UI clicks from firing raycaster
+    if (event.clientY < 60 || event.clientX > window.innerWidth - 120 && event.clientY < 60) return;
+
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+    raycaster.setFromCamera(mouse, camera);
+    const intersects = raycaster.intersectObjects(interactiveObjects, true);
+
+    if (intersects.length > 0) {
+        let obj = intersects[0].object;
+        // Traverse up to find user data
+        while (obj && !obj.userData?.deskNumber) {
+            obj = obj.parent;
+        }
+
+        if (obj && obj.userData) {
+            showModal(obj.userData);
+        }
+    }
+});
+
+function showModal(data) {
+    const modal = document.getElementById("modal");
+    document.getElementById("modalTitle").textContent = `Desk #${data.deskNumber}`;
+    document.getElementById("modalDesc").innerHTML = `
+        <b>Row:</b> ${Math.floor((data.deskNumber - 1) / 4) + 1}<br>
+        <b>Column:</b> ${((data.deskNumber - 1) % 4) + 1}<br>
+        <b>Left Seat Student:</b> ${data.student1 !== null ? "Student #" + data.student1 : "Empty"}<br>
+        <b>Right Seat Student:</b> ${data.student2 !== null ? "Student #" + data.student2 : "Empty"}
+    `;
+    modal.classList.add("active");
+}
+
+document.getElementById("closeModal").addEventListener("click", () => {
+    document.getElementById("modal").classList.remove("active");
+});
+
+/* =========================================================
+   DESK & CHAIR CREATION
+========================================================= */
+function createDesk(student1, student2, deskNumber){
+    const group = new THREE.Group();
+    group.userData = { deskNumber, student1, student2 };
+
+    const top = new THREE.Mesh(new THREE.BoxGeometry(2.7, .18, 1.35), woodMat);
+    top.position.y = 2.05;
+    top.castShadow = true;
+    top.receiveShadow = true;
+    group.add(top);
+
+    const back = new THREE.Mesh(new THREE.BoxGeometry(2.7, .65, .10), woodDarkMat);
+    back.position.set(0, 2.35, -.58);
+    group.add(back);
+
+    [[ -1.05, -.48 ], [ 1.05, -.48 ], [ -1.05, .48 ], [ 1.05, .48 ]].forEach(([x, z]) => {
+        const leg = new THREE.Mesh(new THREE.BoxGeometry(.10, 2.05, .10), metalMat);
+        leg.position.set(x, 1.02, z);
+        leg.castShadow = true;
+        group.add(leg);
+    });
+
+    createChair(group, -.72, student1);
+    createChair(group, .72, student2);
+
+    // Register for raycasting
+    group.traverse(child => {
+        child.userData = group.userData;
+        interactiveObjects.push(child);
+    });
+
+    return group;
+}
+
+function createChair(parent, x, student){
+    const seat = new THREE.Mesh(new THREE.BoxGeometry(1.05, .16, .75), woodMat);
+    seat.position.set(x, .9, .85);
+    seat.castShadow = true;
+    parent.add(seat);
+
+    const back = new THREE.Mesh(new THREE.BoxGeometry(1.05, 1.05, .12), woodMat);
+    back.position.set(x, 1.35, 1.15);
+    back.castShadow = true;
+    parent.add(back);
+}
+
+/* =========================================================
+   SEATING & DATE LOGIC
+========================================================= */
+const students = Array.from({length: 41}, (_, i) => i + 1);
+
+function workingDaysSinceStart(date){
+    const start = new Date(START_DATE.getFullYear(), START_DATE.getMonth(), START_DATE.getDate());
+    const target = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    if (target <= start) return 0;
+
+    let days = 0;
+    const current = new Date(start);
+    while (current < target){
+        current.setDate(current.getDate() + 1);
+        if (current.getDay() !== 0) days++;
+    }
+    return days;
+}
+
+function getSeating(date){
+    const days = workingDaysSinceStart(date);
+    const shift = (days * 2) % 48;
+    const result = new Array(48).fill(null);
+
+    for (let newPos = 0; newPos < 48; newPos++){
+        const oldPos = (newPos - shift + 48) % 48;
+        if (oldPos < 41){
+            result[newPos] = students[oldPos];
+        }
+    }
+    return result;
+}
+
+function createClassroom(){
+    const today = new Date();
+    const seating = getSeating(today);
+
+    const startX = -5.4;
+    const gapX = 3.6;
+    const startZ = -6.0;
+    const gapZ = 2.65;
+
+    for (let row = 0; row < 6; row++){
+        for (let col = 0; col < 4; col++){
+            const deskNumber = row * 4 + col + 1;
+            const student1 = seating[(deskNumber - 1) * 2];
+            const student2 = seating[(deskNumber - 1) * 2 + 1];
+
+            const desk = createDesk(student1, student2, deskNumber);
+            desk.position.set(startX + col * gapX, 0, startZ + row * gapZ);
+            scene.add(desk);
+        }
+    }
+}
+
+function updateDate(){
+    const today = new Date();
+    const text = today.toLocaleDateString("en-IN", {
+        weekday: "long", day: "numeric", month: "long", year: "numeric"
+    });
+    document.getElementById("date").textContent = text + (today.getDay() === 0 ? " • Sunday — no movement" : " • automatic seating rotation");
+}
+
+/* =========================================================
+   RESET VIEW
+========================================================= */
+document.getElementById("reset").addEventListener("click", () => {
+    camera.position.set(15, 14, 19);
+    controls.target.set(0, 2, 0);
+    controls.update();
+});
+
+/* =========================================================
+   INITIALIZATION & LOOP
+========================================================= */
+createClassroom();
+updateDate();
+
+window.addEventListener("resize", () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+function animate(){
+    requestAnimationFrame(animate);
+    controls.update();
+    renderer.render(scene, camera);
+}
+animate();
+
+</script>
+</body>
+</html>
