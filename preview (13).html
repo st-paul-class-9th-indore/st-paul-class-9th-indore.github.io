@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Classroom Seating</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #eef2f7;
+    color: #17202a;
+}
+
+.container {
+    max-width: 1100px;
+    margin: auto;
+    padding: 25px 15px;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 5px;
+}
+
+.subtitle {
+    text-align: center;
+    color: #667085;
+    margin-bottom: 20px;
+}
+
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.date-box {
+    background: white;
+    padding: 12px 18px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.08);
+}
+
+.date-box strong {
+    display: block;
+    font-size: 18px;
+}
+
+.date-box span {
+    font-size: 13px;
+    color: #667085;
+}
+
+.classroom {
+    background: white;
+    padding: 25px;
+    border-radius: 16px;
+    box-shadow: 0 5px 25px rgba(0,0,0,.08);
+}
+
+.board {
+    width: 60%;
+    margin: 0 auto 30px;
+    padding: 12px;
+    text-align: center;
+    background: #222;
+    color: white;
+    border-radius: 8px;
+    font-weight: bold;
+}
+
+/* EXACTLY 4 COLUMNS */
+.desk-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+}
+
+/* Each desk */
+.desk {
+    border: 2px solid #d7dce2;
+    border-radius: 12px;
+    padding: 10px;
+    background: #fafafa;
+}
+
+.desk-number {
+    text-align: center;
+    font-size: 12px;
+    font-weight: bold;
+    color: #667085;
+    margin-bottom: 8px;
+}
+
+/* Two seats per desk */
+.seats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 7px;
+}
+
+.seat {
+    min-height: 65px;
+    border-radius: 9px;
+    border: 1px solid #93c5fd;
+    background: #dbeafe;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.seat small {
+    margin-top: 4px;
+    font-size: 9px;
+    color: #64748b;
+    font-weight: normal;
+}
+
+.empty {
+    background: #f3f4f6;
+    border-color: #d1d5db;
+    color: #9ca3af;
+}
+
+.info {
+    margin-top: 25px;
+    padding: 15px;
+    background: #f8fafc;
+    border-radius: 10px;
+    text-align: center;
+    color: #667085;
+    font-size: 13px;
+}
+
+/* Mobile: still 4 columns, horizontal scroll */
+.grid-wrapper {
+    overflow-x: auto;
+}
+
+@media (max-width: 700px) {
+    .desk-grid {
+        grid-template-columns: repeat(4, 150px);
+    }
+
+    .grid-wrapper {
+        padding-bottom: 10px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Classroom Seating Plan</h1>
+
+    <div class="subtitle">
+        24 Desks • 4 Columns × 6 Rows • 48 Seats • 41 Students
+    </div>
+
+    <div class="topbar">
+        <div class="date-box">
+            <strong id="currentDate"></strong>
+            <span id="dayStatus"></span>
+        </div>
+    </div>
+
+    <div class="classroom">
+
+        <div class="board">
+            TEACHER / BOARD
+        </div>
+
+        <div class="grid-wrapper">
+            <div id="deskGrid" class="desk-grid"></div>
+        </div>
+
+        <div class="info">
+            Every working day, each student moves
+            <strong>one desk forward</strong>.
+            Sunday is skipped automatically.
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+/* =====================================================
+   BASIC SETTINGS
+===================================================== */
+
+const START_DATE = new Date(2026, 9, 6);
+// 6 October 2026
+
+const TOTAL_DESKS = 24;
+const TOTAL_SEATS = 48;
+const TOTAL_STUDENTS = 41;
+
+const COLUMNS = 4;
+const ROWS = 6;
+
+
+/* =====================================================
+   STUDENT NUMBERS
+
+   You can later replace these numbers with your
+   own student numbers/names.
+===================================================== */
+
+const students = Array.from(
+    { length: TOTAL_STUDENTS },
+    (_, i) => i + 1
+);
+
+
+/* =====================================================
+   COUNT WORKING DAYS
+
+   Sunday = no movement
+===================================================== */
+
+function getWorkingDaysSinceStart(date) {
+
+    const start = new Date(
+        START_DATE.getFullYear(),
+        START_DATE.getMonth(),
+        START_DATE.getDate()
+    );
+
+    const target = new Date(
+        date.getFullYear(),
+        date.getMonth(),
+        date.getDate()
+    );
+
+    if (target <= start) {
+        return 0;
+    }
+
+    let workingDays = 0;
+
+    const current = new Date(start);
+
+    while (current < target) {
+
+        current.setDate(current.getDate() + 1);
+
+        // Sunday = 0
+        if (current.getDay() !== 0) {
+            workingDays++;
+        }
+    }
+
+    return workingDays;
+}
+
+
+/* =====================================================
+   GET TODAY'S SEATING
+===================================================== */
+
+function getSeating(date) {
+
+    const workingDays =
+        getWorkingDaysSinceStart(date);
+
+    /*
+        Every desk has 2 seats.
+
+        Moving 1 desk forward =
+        moving 2 seat positions.
+
+        Example:
+
+        Desk 1 -> Desk 2
+        Desk 2 -> Desk 3
+        ...
+        Desk 24 -> Desk 1
+    */
+
+    const shift =
+        (workingDays * 2) % TOTAL_SEATS;
+
+    const seating =
+        new Array(TOTAL_SEATS).fill(null);
+
+
+    for (let newPosition = 0;
+         newPosition < TOTAL_SEATS;
+         newPosition++) {
+
+        const oldPosition =
+            (newPosition - shift + TOTAL_SEATS)
+            % TOTAL_SEATS;
+
+        if (oldPosition < TOTAL_STUDENTS) {
+
+            seating[newPosition] =
+                students[oldPosition];
+        }
+    }
+
+    return seating;
+}
+
+
+/* =====================================================
+   CREATE SEAT
+===================================================== */
+
+function createSeat(
+    studentNumber,
+    seatNumber
+) {
+
+    const seat =
+        document.createElement("div");
+
+    seat.className = "seat";
+
+    if (studentNumber === null) {
+
+        seat.classList.add("empty");
+
+        seat.innerHTML = `
+            EMPTY
+            <small>Seat ${seatNumber}</small>
+        `;
+
+    } else {
+
+        seat.innerHTML = `
+            ${studentNumber}
+            <small>Seat ${seatNumber}</small>
+        `;
+    }
+
+    return seat;
+}
+
+
+/* =====================================================
+   RENDER 4 COLUMNS × 6 ROWS
+===================================================== */
+
+function render(date) {
+
+    const seating =
+        getSeating(date);
+
+    const grid =
+        document.getElementById("deskGrid");
+
+    grid.innerHTML = "";
+
+
+    /*
+        24 desks total.
+
+        CSS grid creates:
+
+        Column 1 | Column 2 | Column 3 | Column 4
+        Desk 1   | Desk 2   | Desk 3   | Desk 4
+        Desk 5   | Desk 6   | Desk 7   | Desk 8
+        Desk 9   | Desk 10  | Desk 11  | Desk 12
+        Desk 13  | Desk 14  | Desk 15  | Desk 16
+        Desk 17  | Desk 18  | Desk 19  | Desk 20
+        Desk 21  | Desk 22  | Desk 23  | Desk 24
+
+        = 4 columns × 6 rows
+    */
+
+
+    for (let desk = 0;
+         desk < TOTAL_DESKS;
+         desk++) {
+
+        const deskElement =
+            document.createElement("div");
+
+        deskElement.className = "desk";
+
+
+        const deskNumber =
+            document.createElement("div");
+
+        deskNumber.className =
+            "desk-number";
+
+        deskNumber.textContent =
+            `DESK ${desk + 1}`;
+
+
+        const seats =
+            document.createElement("div");
+
+        seats.className = "seats";
+
+
+        const firstSeat =
+            desk * 2;
+
+
+        seats.appendChild(
+            createSeat(
+                seating[firstSeat],
+                firstSeat + 1
+            )
+        );
+
+
+        seats.appendChild(
+            createSeat(
+                seating[firstSeat + 1],
+                firstSeat + 2
+            )
+        );
+
+
+        deskElement.appendChild(deskNumber);
+        deskElement.appendChild(seats);
+
+        grid.appendChild(deskElement);
+    }
+
+
+    updateDate(date);
+}
+
+
+/* =====================================================
+   DATE DISPLAY
+===================================================== */
+
+function updateDate(date) {
+
+    const dateText =
+        date.toLocaleDateString(
+            "en-IN",
+            {
+                weekday: "long",
+                day: "numeric",
+                month: "long",
+                year: "numeric"
+            }
+        );
+
+    document.getElementById(
+        "currentDate"
+    ).textContent = dateText;
+
+
+    if (date.getDay() === 0) {
+
+        document.getElementById(
+            "dayStatus"
+        ).textContent =
+            "Sunday — no seating change";
+
+    } else {
+
+        document.getElementById(
+            "dayStatus"
+        ).textContent =
+            "Automatic daily rotation";
+    }
+}
+
+
+/* =====================================================
+   START
+===================================================== */
+
+render(new Date());
+
+</script>
+
+</body>
+</html>
