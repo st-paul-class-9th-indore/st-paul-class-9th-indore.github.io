@@ -4,17 +4,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Class IX-E Time Table | St. Paul</title>
 
+<!-- Google Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<!-- IX-E SVG Favicon -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23dc3545'/%3E%3Ctext x='50' y='43' font-size='29' font-weight='bold' text-anchor='middle' fill='white' font-family='Arial'%3EIX%3C/text%3E%3Ctext x='50' y='73' font-size='25' font-weight='bold' text-anchor='middle' fill='white' font-family='Arial'%3EE%3C/text%3E%3C/svg%3E">
 
 <style>
 :root {
     --primary: #dc3545;
     --primary-dark: #a91f2e;
-    --accent: #fff1c9;
     --background: #f4f6fb;
     --text: #202638;
     --muted: #778096;
@@ -31,16 +35,17 @@ body {
     font-family: 'Inter', sans-serif;
     background: var(--background);
     color: var(--text);
+    min-height: 100vh;
 }
 
 /* Navigation */
 .top-bar {
-    height: 76px;
-    background: rgba(255,255,255,0.95);
+    min-height: 72px;
+    background: rgba(255,255,255,0.97);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 6%;
+    padding: 12px 6%;
     position: sticky;
     top: 0;
     z-index: 1000;
@@ -58,36 +63,36 @@ body {
     color: var(--primary);
 }
 
-.index-btn {
+.home-btn {
     text-decoration: none;
     background: var(--primary);
     color: white;
-    border: none;
-    padding: 12px 24px;
+    padding: 12px 23px;
     border-radius: 10px;
     font-size: 13px;
     font-weight: 700;
-    letter-spacing: 0.5px;
-    cursor: pointer;
     transition: 0.25s;
     box-shadow: 0 5px 14px rgba(220,53,69,0.2);
+    white-space: nowrap;
 }
 
-.index-btn:hover {
+.home-btn:hover {
     background: var(--primary-dark);
     transform: translateY(-2px);
 }
 
-/* Main */
+/* Main Container */
 .container {
-    max-width: 1250px;
-    margin: 55px auto;
-    padding: 0 25px;
+    width: 100%;
+    max-width: 1350px;
+    margin: 45px auto;
+    padding: 0 24px;
 }
 
+/* Header */
 .header-section {
     text-align: center;
-    margin-bottom: 35px;
+    margin-bottom: 32px;
 }
 
 .tag {
@@ -99,24 +104,51 @@ body {
     font-size: 11px;
     font-weight: 800;
     letter-spacing: 1.2px;
-    margin-bottom: 18px;
+    margin-bottom: 17px;
 }
 
 .header-section h1 {
-    font-size: clamp(25px, 4vw, 39px);
+    font-size: clamp(25px, 4vw, 40px);
     font-weight: 800;
     letter-spacing: -1.5px;
     margin-bottom: 12px;
 }
 
-.header-section p {
+.school-name {
     color: var(--muted);
     font-size: 14px;
     line-height: 1.7;
 }
 
-/* Table */
+.school-link {
+    display: inline-block;
+    color: var(--primary);
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+    margin-top: 5px;
+    transition: 0.2s;
+}
+
+.school-link:hover {
+    color: var(--primary-dark);
+    text-decoration: underline;
+}
+
+.last-updated {
+    margin-top: 12px;
+    font-size: 12px;
+    color: var(--muted);
+}
+
+.last-updated strong {
+    color: var(--primary);
+    font-weight: 700;
+}
+
+/* Timetable Card */
 .table-card {
+    width: 100%;
     background: white;
     border-radius: 18px;
     overflow: hidden;
@@ -129,6 +161,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 12px;
     border-bottom: 1px solid var(--border);
 }
 
@@ -142,40 +175,44 @@ body {
     font-size: 12px;
 }
 
+/* Responsive Table */
 .table-wrapper {
+    width: 100%;
     overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 table {
     width: 100%;
-    min-width: 950px;
     border-collapse: separate;
     border-spacing: 0;
+    table-layout: auto;
 }
 
 thead th {
     background: #f9fafc;
     color: #737d91;
-    padding: 19px 12px;
-    font-size: 11px;
+    padding: 17px 8px;
+    font-size: clamp(9px, 0.85vw, 11px);
     font-weight: 800;
-    letter-spacing: 0.6px;
+    letter-spacing: 0.3px;
     text-transform: uppercase;
     border-bottom: 1px solid var(--border);
+    white-space: nowrap;
 }
 
 thead th:first-child {
     text-align: left;
-    padding-left: 25px;
+    padding-left: 20px;
 }
 
 tbody td {
-    padding: 19px 12px;
+    padding: 17px 7px;
     text-align: center;
-    font-size: 12px;
+    font-size: clamp(10px, 0.9vw, 12px);
     font-weight: 600;
     border-bottom: 1px solid #f0f2f6;
-    white-space: nowrap;
+    overflow-wrap: anywhere;
     transition: background 0.2s;
 }
 
@@ -185,11 +222,12 @@ tbody tr:last-child td {
 
 .day-column {
     text-align: left;
-    padding-left: 25px;
+    padding-left: 20px;
     font-weight: 800;
     color: var(--text);
     background: #fcfcfe;
     border-right: 1px solid var(--border);
+    white-space: nowrap;
 }
 
 tbody tr:hover td {
@@ -200,7 +238,7 @@ tbody tr:hover .day-column {
     background: #fff1e5;
 }
 
-/* Today's row */
+/* Today's Highlight */
 .today-highlight td {
     background: #fff8e7 !important;
     border-bottom: 1px solid #f5dfae;
@@ -214,9 +252,9 @@ tbody tr:hover .day-column {
 
 /* Notes */
 .footer-note {
-    margin-top: 28px;
+    margin-top: 25px;
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 15px;
 }
 
@@ -249,36 +287,166 @@ tbody tr:hover .day-column {
     font-size: 11px;
 }
 
-@media(max-width: 650px) {
+/* Tablet */
+@media (max-width: 900px) {
+    .container {
+        padding: 0 16px;
+        margin: 35px auto;
+    }
+
+    .table-wrapper {
+        overflow-x: auto;
+    }
+
+    table {
+        min-width: 760px;
+    }
+
+    thead th {
+        font-size: 10px;
+        padding: 15px 7px;
+    }
+
+    tbody td {
+        padding: 15px 7px;
+        font-size: 11px;
+    }
+}
+
+/* Mobile */
+@media (max-width: 600px) {
     .top-bar {
-        height: 66px;
-        padding: 0 18px;
+        min-height: 64px;
+        padding: 10px 16px;
     }
 
     .brand {
         font-size: 16px;
     }
 
-    .index-btn {
-        padding: 10px 17px;
+    .home-btn {
+        padding: 10px 16px;
         font-size: 11px;
     }
 
     .container {
-        margin: 38px auto;
-        padding: 0 13px;
+        padding: 0 12px;
+        margin: 30px auto;
     }
 
     .header-section {
-        margin-bottom: 25px;
+        margin-bottom: 24px;
+    }
+
+    .header-section h1 {
+        font-size: 27px;
+        letter-spacing: -1px;
+    }
+
+    .school-name {
+        font-size: 12px;
+    }
+
+    .school-link {
+        font-size: 12px;
+    }
+
+    .last-updated {
+        font-size: 11px;
+    }
+
+    .table-card {
+        border-radius: 13px;
     }
 
     .table-heading {
-        padding: 18px;
+        padding: 17px 15px;
+    }
+
+    .table-heading h2 {
+        font-size: 14px;
+    }
+
+    .table-heading span {
+        font-size: 10px;
+    }
+
+    /* Compact timetable for mobile */
+    table {
+        min-width: 0;
+        table-layout: fixed;
+    }
+
+    thead th {
+        padding: 12px 3px;
+        font-size: 8px;
+        letter-spacing: 0;
+        white-space: normal;
+        overflow-wrap: anywhere;
+    }
+
+    thead th:first-child {
+        padding-left: 5px;
+        text-align: center;
+    }
+
+    tbody td {
+        padding: 13px 3px;
+        font-size: 9px;
+        white-space: normal;
+        overflow-wrap: anywhere;
+        line-height: 1.4;
+    }
+
+    .day-column {
+        padding-left: 5px;
+        text-align: center;
+        font-size: 9px;
+        white-space: normal;
     }
 
     .footer-note {
         grid-template-columns: 1fr;
+        gap: 12px;
+        margin-top: 18px;
+    }
+
+    .note-card {
+        padding: 15px;
+        font-size: 11px;
+    }
+
+    .footer {
+        padding: 25px 10px;
+    }
+}
+
+/* Very Small Phones */
+@media (max-width: 360px) {
+    .container {
+        padding: 0 8px;
+    }
+
+    .header-section h1 {
+        font-size: 23px;
+    }
+
+    thead th {
+        font-size: 7px;
+        padding: 10px 2px;
+    }
+
+    tbody td {
+        font-size: 8px;
+        padding: 11px 2px;
+    }
+
+    .day-column {
+        font-size: 8px;
+    }
+
+    .table-heading h2 {
+        font-size: 12px;
     }
 }
 </style>
@@ -286,19 +454,42 @@ tbody tr:hover .day-column {
 
 <body>
 
+<!-- Navigation -->
 <nav class="top-bar">
     <div class="brand">CLASS <span>IX-E</span></div>
-    <a href="index.html" class="index-btn">← INDEX</a>
+    <a href="home" class="home-btn">← HOME</a>
 </nav>
 
+<!-- Main Content -->
 <main class="container">
 
+    <!-- Header -->
     <header class="header-section">
+
         <div class="tag">ACADEMIC SESSION 2026–27</div>
+
         <h1>Weekly Time Table</h1>
-        <p>St. Paul Higher Secondary School, Indore</p>
+
+        <p class="school-name">
+            St. Paul Higher Secondary School, Indore
+        </p>
+
+        <a
+            href="https://stpaulindore.github.io"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="school-link"
+        >
+            stpaulindore.github.io ↗
+        </a>
+
+        <div class="last-updated">
+            Last updated on <strong>19 November 2026</strong>
+        </div>
+
     </header>
 
+    <!-- Timetable -->
     <section class="table-card">
 
         <div class="table-heading">
@@ -307,18 +498,19 @@ tbody tr:hover .day-column {
         </div>
 
         <div class="table-wrapper">
+
             <table>
                 <thead>
                     <tr>
                         <th>Day</th>
-                        <th>1st Period</th>
-                        <th>2nd Period</th>
-                        <th>3rd Period</th>
-                        <th>4th Period</th>
-                        <th>5th Period</th>
-                        <th>6th Period</th>
-                        <th>7th Period</th>
-                        <th>8th Period</th>
+                        <th>1st<br>Period</th>
+                        <th>2nd<br>Period</th>
+                        <th>3rd<br>Period</th>
+                        <th>4th<br>Period</th>
+                        <th>5th<br>Period</th>
+                        <th>6th<br>Period</th>
+                        <th>7th<br>Period</th>
+                        <th>8th<br>Period</th>
                     </tr>
                 </thead>
 
@@ -398,9 +590,11 @@ tbody tr:hover .day-column {
 
                 </tbody>
             </table>
+
         </div>
     </section>
 
+    <!-- Notes -->
     <section class="footer-note">
 
         <div class="note-card">
@@ -417,12 +611,15 @@ tbody tr:hover .day-column {
 
 </main>
 
+<!-- Footer -->
 <footer class="footer">
     St. Paul Higher Secondary School, Indore
 </footer>
 
 <script>
+// Automatically highlight today's timetable row
 function highlightToday() {
+
     const days = [
         'sunday',
         'monday',
@@ -436,6 +633,7 @@ function highlightToday() {
     const today = days[new Date().getDay()];
 
     if (today !== 'sunday') {
+
         const row = document.getElementById(today);
 
         if (row) {
