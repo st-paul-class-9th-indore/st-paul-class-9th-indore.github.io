@@ -1,241 +1,451 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Class IX-E Time Table | St. Paul</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Class IX-E Time Table | St. Paul</title>
 
-        :root {
-            --school-red: #f44336;
-            --school-yellow: #ffeb3b;
-            --school-dark: #b71c1c;
-            --text-main: #333;
-        }
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: #f0f2f5;
-            margin: 0;
-            color: var(--text-main);
-        }
+<style>
+:root {
+    --primary: #dc3545;
+    --primary-dark: #a91f2e;
+    --accent: #fff1c9;
+    --background: #f4f6fb;
+    --text: #202638;
+    --muted: #778096;
+    --border: #e9edf4;
+}
 
-        /* Top Navigation Bar */
-        .top-bar {
-            background: white;
-            padding: 10px 5%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            border-bottom: 4px solid var(--school-red);
-        }
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-        .logo { height: 55px; }
+body {
+    font-family: 'Inter', sans-serif;
+    background: var(--background);
+    color: var(--text);
+}
 
-        .home-btn {
-            text-decoration: none;
-            color: white;
-            background: var(--school-red);
-            font-weight: 600;
-            padding: 8px 25px;
-            border-radius: 50px;
-            transition: 0.3s;
-            border: 2px solid var(--school-dark);
-        }
+/* Navigation */
+.top-bar {
+    height: 76px;
+    background: rgba(255,255,255,0.95);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 6%;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 3px 20px rgba(25,35,60,0.06);
+    border-bottom: 1px solid var(--border);
+}
 
-        .home-btn:hover {
-            background: var(--school-yellow);
-            color: var(--school-dark);
-        }
+.brand {
+    font-size: 19px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+}
 
-        /* Main Container */
-        .container {
-            max-width: 1100px;
-            margin: 40px auto;
-            padding: 0 20px;
-        }
+.brand span {
+    color: var(--primary);
+}
 
-        .header-section {
-            text-align: center;
-            margin-bottom: 30px;
-        }
+.index-btn {
+    text-decoration: none;
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: 0.25s;
+    box-shadow: 0 5px 14px rgba(220,53,69,0.2);
+}
 
-        .header-section h1 {
-            color: var(--school-dark);
-            font-size: 2.5rem;
-            margin: 0;
-            text-transform: uppercase;
-        }
+.index-btn:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+}
 
-        .header-section p {
-            color: #666;
-            font-size: 1.1rem;
-        }
+/* Main */
+.container {
+    max-width: 1250px;
+    margin: 55px auto;
+    padding: 0 25px;
+}
 
-        /* Time Table Style */
-        .table-card {
-            background: white;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            border: 1px solid #ddd;
-        }
+.header-section {
+    text-align: center;
+    margin-bottom: 35px;
+}
 
-        .table-wrapper {
-            overflow-x: auto;
-        }
+.tag {
+    display: inline-block;
+    background: #ffe6e9;
+    color: var(--primary-dark);
+    padding: 7px 15px;
+    border-radius: 30px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1.2px;
+    margin-bottom: 18px;
+}
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            min-width: 900px;
-        }
+.header-section h1 {
+    font-size: clamp(25px, 4vw, 39px);
+    font-weight: 800;
+    letter-spacing: -1.5px;
+    margin-bottom: 12px;
+}
 
-        th {
-            background: var(--school-red);
-            color: white;
-            padding: 20px 10px;
-            text-transform: uppercase;
-            font-size: 0.85rem;
-            letter-spacing: 1px;
-        }
+.header-section p {
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.7;
+}
 
-        td {
-            padding: 15px;
-            text-align: center;
-            border-bottom: 1px solid #eee;
-            font-weight: 500;
-            text-transform: capitalize;
-        }
+/* Table */
+.table-card {
+    background: white;
+    border-radius: 18px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    box-shadow: 0 12px 40px rgba(35,45,75,0.07);
+}
 
-        .day-column {
-            background: #fdfdfd;
-            font-weight: 700;
-            color: var(--school-dark);
-            text-align: left;
-            padding-left: 20px;
-            border-right: 2px solid var(--school-yellow);
-        }
+.table-heading {
+    padding: 22px 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+}
 
-        /* Row Highlighting */
-        tr:hover td {
-            background: #fffde7; /* Light Yellow hover */
-        }
+.table-heading h2 {
+    font-size: 16px;
+    font-weight: 800;
+}
 
-        .today-highlight {
-            background: #fff9c4 !important;
-            border: 2px solid var(--school-red);
-        }
+.table-heading span {
+    color: var(--muted);
+    font-size: 12px;
+}
 
-        .today-highlight .day-column {
-            background: var(--school-yellow) !important;
-        }
+.table-wrapper {
+    overflow-x: auto;
+}
 
-        /* Footer Notes */
-        .footer-note {
-            margin-top: 25px;
-            padding: 20px;
-            background: #fffde7;
-            border-left: 5px solid var(--school-red);
-            border-radius: 5px;
-            font-size: 0.9rem;
-            color: #555;
-        }
+table {
+    width: 100%;
+    min-width: 950px;
+    border-collapse: separate;
+    border-spacing: 0;
+}
 
-        .footer-note b { color: var(--school-dark); }
+thead th {
+    background: #f9fafc;
+    color: #737d91;
+    padding: 19px 12px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--border);
+}
 
-        @media (max-width: 768px) {
-            .header-section h1 { font-size: 1.8rem; }
-            .logo { height: 40px; }
-        }
-    </style>
+thead th:first-child {
+    text-align: left;
+    padding-left: 25px;
+}
+
+tbody td {
+    padding: 19px 12px;
+    text-align: center;
+    font-size: 12px;
+    font-weight: 600;
+    border-bottom: 1px solid #f0f2f6;
+    white-space: nowrap;
+    transition: background 0.2s;
+}
+
+tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.day-column {
+    text-align: left;
+    padding-left: 25px;
+    font-weight: 800;
+    color: var(--text);
+    background: #fcfcfe;
+    border-right: 1px solid var(--border);
+}
+
+tbody tr:hover td {
+    background: #fff8f0;
+}
+
+tbody tr:hover .day-column {
+    background: #fff1e5;
+}
+
+/* Today's row */
+.today-highlight td {
+    background: #fff8e7 !important;
+    border-bottom: 1px solid #f5dfae;
+}
+
+.today-highlight .day-column {
+    color: var(--primary-dark);
+    background: #ffedc7 !important;
+    border-left: 4px solid var(--primary);
+}
+
+/* Notes */
+.footer-note {
+    margin-top: 28px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.note-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 13px;
+    padding: 19px;
+    font-size: 12px;
+    line-height: 1.8;
+    color: #687287;
+}
+
+.note-card b {
+    color: var(--text);
+    display: block;
+    margin-bottom: 5px;
+    font-size: 13px;
+}
+
+.note-card.warning {
+    border-left: 4px solid #e5a52d;
+}
+
+/* Footer */
+.footer {
+    text-align: center;
+    padding: 30px 15px;
+    color: #98a0af;
+    font-size: 11px;
+}
+
+@media(max-width: 650px) {
+    .top-bar {
+        height: 66px;
+        padding: 0 18px;
+    }
+
+    .brand {
+        font-size: 16px;
+    }
+
+    .index-btn {
+        padding: 10px 17px;
+        font-size: 11px;
+    }
+
+    .container {
+        margin: 38px auto;
+        padding: 0 13px;
+    }
+
+    .header-section {
+        margin-bottom: 25px;
+    }
+
+    .table-heading {
+        padding: 18px;
+    }
+
+    .footer-note {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
 </head>
+
 <body>
 
-    <nav class="top-bar">
-        <img src="IX.png" alt="IX-E" class="logo">
-        <button class="home-btn" onclick="history.back()">← BACK</button>
-        <img src="logo.png" alt="St. Paul Logo" class="logo">
-    </nav>
+<nav class="top-bar">
+    <div class="brand">CLASS <span>IX-E</span></div>
+    <a href="index.html" class="index-btn">← INDEX</a>
+</nav>
 
-    <div class="container">
-        <div class="header-section">
-            <h1>Class IX-E Weekly Schedule</h1>
-            <p>St. Paul Higher Secondary School, Indore (2026-27)</p>
+<main class="container">
+
+    <header class="header-section">
+        <div class="tag">ACADEMIC SESSION 2026–27</div>
+        <h1>Weekly Time Table</h1>
+        <p>St. Paul Higher Secondary School, Indore</p>
+    </header>
+
+    <section class="table-card">
+
+        <div class="table-heading">
+            <h2>Class IX-E Schedule</h2>
+            <span>Monday – Saturday</span>
         </div>
 
-        <div class="table-card">
-            <div class="table-wrapper">
-                <table>
-                    <thead>
-                        <tr>
-                            <th style="text-align: left; padding-left: 20px;">Day</th>
-                            <th>1<sup>st</sup> Period</th>
-                            <th>2<sup>nd</sup> Period</th>
-                            <th>3<sup>rd</sup> Period</th>
-                            <th>4<sup>th</sup> Period</th>
-                            <th>5<sup>th</sup> Period</th>
-                            <th>6<sup>th</sup> Period</th>
-                            <th>7<sup>th</sup> Period</th>
-                            <th>8<sup>th</sup> Period</th>
-                        </tr>
-                    </thead>
-                    <tbody id="timetable-body">
-                        <tr id="monday">
-                            <td class="day-column">Monday</td>
-                            <td>Physics</td><td>Games</td><td>AI</td><td>Maths</td><td>Hindi</td><td>Bio</td><td>Eng</td><td>SST</td>
-                        </tr>
-                        <tr id="tuesday">
-                            <td class="day-column">Tuesday</td>
-                            <td>Physics</td><td>Life Skills</td><td>SST</td><td>English</td><td>Biology</td><td>English</td><td>Maths</td><td>Hindi</td>
-                        </tr>
-                        <tr id="wednesday">
-                            <td class="day-column">Wednesday</td>
-                            <td>SST</td><td>Sanskrit</td><td>Maths</td><td>English</td><td>SST</td><td>Chemistry</td><td>Maths</td><td>Hindi</td>
-                        </tr>
-                        <tr id="thursday">
-                            <td class="day-column">Thursday</td>
-                            <td>Maths</td><td>Arts</td><td>Moral Science</td><td>SST</td><td>Hindi</td><td>English</td><td>CC</td><td>CC</td>
-                        </tr>
-                        <tr id="friday">
-                            <td class="day-column">Friday</td>
-                            <td>Maths</td><td>AI</td><td>SST</td><td>Maths</td><td>Physics</td><td>Music/Dance</td><td>Chemistry</td><td>sanskrit</td>
-                        </tr>
-                        <tr id="saturday">
-                            <td class="day-column">Saturday</td>
-                            <td>Chemi</td><td>SST</td><td>English</td><td>Bio</td><td>AI</td><td>Games</td><td>Maths</td><td>—</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Day</th>
+                        <th>1st Period</th>
+                        <th>2nd Period</th>
+                        <th>3rd Period</th>
+                        <th>4th Period</th>
+                        <th>5th Period</th>
+                        <th>6th Period</th>
+                        <th>7th Period</th>
+                        <th>8th Period</th>
+                    </tr>
+                </thead>
+
+                <tbody id="timetable-body">
+
+                    <tr id="monday">
+                        <td class="day-column">Monday</td>
+                        <td>Physics</td>
+                        <td>Games</td>
+                        <td>AI</td>
+                        <td>Maths</td>
+                        <td>Hindi</td>
+                        <td>Bio</td>
+                        <td>Eng</td>
+                        <td>SST</td>
+                    </tr>
+
+                    <tr id="tuesday">
+                        <td class="day-column">Tuesday</td>
+                        <td>Physics</td>
+                        <td>Life Skills</td>
+                        <td>SST</td>
+                        <td>English</td>
+                        <td>Biology</td>
+                        <td>English</td>
+                        <td>Maths</td>
+                        <td>Hindi</td>
+                    </tr>
+
+                    <tr id="wednesday">
+                        <td class="day-column">Wednesday</td>
+                        <td>SST</td>
+                        <td>Sanskrit</td>
+                        <td>Maths</td>
+                        <td>English</td>
+                        <td>SST</td>
+                        <td>Chemistry</td>
+                        <td>Maths</td>
+                        <td>Hindi</td>
+                    </tr>
+
+                    <tr id="thursday">
+                        <td class="day-column">Thursday</td>
+                        <td>Maths</td>
+                        <td>Arts</td>
+                        <td>Moral Science</td>
+                        <td>SST</td>
+                        <td>Hindi</td>
+                        <td>English</td>
+                        <td>CC</td>
+                        <td>CC</td>
+                    </tr>
+
+                    <tr id="friday">
+                        <td class="day-column">Friday</td>
+                        <td>Maths</td>
+                        <td>AI</td>
+                        <td>SST</td>
+                        <td>Maths</td>
+                        <td>Physics</td>
+                        <td>Music/Dance</td>
+                        <td>Chemistry</td>
+                        <td>sanskrit</td>
+                    </tr>
+
+                    <tr id="saturday">
+                        <td class="day-column">Saturday</td>
+                        <td>Chemi</td>
+                        <td>SST</td>
+                        <td>English</td>
+                        <td>Bio</td>
+                        <td>AI</td>
+                        <td>Games</td>
+                        <td>Maths</td>
+                        <td>—</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="footer-note">
+
+        <div class="note-card">
+            <b>📌 Important Note</b>
+            According to IX-E school group 2026.
         </div>
 
-        <div class="footer-note">
-            <p>📌 <b>Note:</b> According to IX-E school group 2026.</p>
-            <p>⚠️ <b>Disclaimer:</b> Data may be incorrect, check with the teacher or handbook before following.</p>
+        <div class="note-card warning">
+            <b>⚠️ Disclaimer</b>
+            Data may be incorrect, check with the teacher or handbook before following.
         </div>
-    </div>
 
-    <script>
-        // Automatic Today Highlighter
-        function highlightToday() {
-            const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
-            const todayIndex = new Date().getDay();
-            const todayId = days[todayIndex];
-            
-            if (todayId !== 'sunday') {
-                const row = document.getElementById(todayId);
-                if (row) {
-                    row.classList.add('today-highlight');
-                }
-            }
+    </section>
+
+</main>
+
+<footer class="footer">
+    St. Paul Higher Secondary School, Indore
+</footer>
+
+<script>
+function highlightToday() {
+    const days = [
+        'sunday',
+        'monday',
+        'tuesday',
+        'wednesday',
+        'thursday',
+        'friday',
+        'saturday'
+    ];
+
+    const today = days[new Date().getDay()];
+
+    if (today !== 'sunday') {
+        const row = document.getElementById(today);
+
+        if (row) {
+            row.classList.add('today-highlight');
         }
-        highlightToday();
-    </script>
+    }
+}
+
+highlightToday();
+</script>
+
 </body>
 </html>
