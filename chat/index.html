@@ -1,0 +1,563 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Class 9th Chat</title>
+
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background: #f5f6f8;
+  color: #222;
+}
+
+header {
+  background: white;
+  padding: 17px;
+  text-align: center;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+header h2 {
+  font-size: 22px;
+}
+
+header p {
+  color: #777;
+  font-size: 13px;
+  margin-top: 5px;
+}
+
+.container {
+  max-width: 650px;
+  margin: 20px auto;
+  padding: 12px;
+}
+
+input, select, button {
+  font: inherit;
+}
+
+input, select {
+  width: 100%;
+  padding: 13px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  outline: none;
+  background: white;
+  margin-top: 10px;
+}
+
+input:focus, select:focus {
+  border-color: #2563eb;
+}
+
+button {
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 17px;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
+#joinPage {
+  background: white;
+  padding: 22px;
+  border-radius: 12px;
+  margin-top: 40px;
+}
+
+#joinPage h3 {
+  margin-bottom: 8px;
+}
+
+#joinPage button {
+  width: 100%;
+  margin-top: 14px;
+}
+
+#chatPage {
+  display: none;
+}
+
+.chatTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.chatTop p {
+  color: #777;
+  font-size: 12px;
+  margin-top: 5px;
+}
+
+.messages {
+  background: white;
+  border: 1px solid #e8e8e8;
+  border-radius: 10px;
+  height: 58vh;
+  min-height: 320px;
+  overflow-y: auto;
+  padding: 14px;
+  margin: 15px 0;
+}
+
+.message {
+  background: #f0f1f4;
+  padding: 12px;
+  border-radius: 9px;
+  margin-bottom: 12px;
+  max-width: 90%;
+  overflow-wrap: anywhere;
+}
+
+.message.own {
+  background: #e8efff;
+  margin-left: auto;
+}
+
+.msgName {
+  font-size: 13px;
+  font-weight: bold;
+  margin-bottom: 6px;
+  color: #2563eb;
+}
+
+.msgText {
+  white-space: pre-wrap;
+  line-height: 1.45;
+}
+
+.msgTime {
+  font-size: 11px;
+  color: #777;
+  margin-top: 7px;
+}
+
+.actions {
+  display: flex;
+  gap: 13px;
+  margin-top: 9px;
+}
+
+.actions button {
+  background: transparent;
+  color: #2563eb;
+  padding: 0;
+  font-size: 12px;
+}
+
+.actions .delete {
+  color: #dc2626;
+}
+
+.sendArea {
+  display: flex;
+  gap: 8px;
+}
+
+.sendArea input {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+}
+
+.sendArea button {
+  flex-shrink: 0;
+}
+
+.status {
+  color: #777;
+  font-size: 12px;
+  text-align: center;
+  margin: 10px;
+}
+
+@media(max-width: 500px) {
+  .container {
+    margin: 10px auto;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h2>Class 9th Chat</h2>
+  <p>A simple place to talk with your friends.</p>
+</header>
+
+<div class="container">
+
+  <!-- JOIN PAGE -->
+  <div id="joinPage">
+    <h3>Welcome to Class 9th Chat</h3>
+    <p style="color:#777;font-size:13px">
+      Enter your name to start chatting.
+    </p>
+
+    <input id="nameInput"
+      placeholder="Enter your name"
+      maxlength="30">
+
+    <select id="expirySelect">
+      <option value="4">Messages expire in 4 hours</option>
+      <option value="24">Messages expire in 24 hours</option>
+    </select>
+
+    <button id="joinBtn" onclick="joinChat()">
+      Start Chatting
+    </button>
+  </div>
+
+  <!-- CHAT PAGE -->
+  <div id="chatPage">
+
+    <div class="chatTop">
+      <div>
+        <h3 id="welcome"></h3>
+        <p>Everyone can read these messages.</p>
+      </div>
+      <button onclick="changeName()">Change name</button>
+    </div>
+
+    <div class="messages" id="messages">
+      <p class="status">Connecting to chat...</p>
+    </div>
+
+    <div class="sendArea">
+      <input id="messageInput"
+        placeholder="Write a message..."
+        maxlength="2000">
+      <button id="sendBtn" onclick="sendMessage()">Send</button>
+    </div>
+
+    <p class="status" id="status"></p>
+
+  </div>
+
+</div>
+
+<script type="module">
+
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+  getAuth,
+  signInAnonymously,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  query,
+  where,
+  orderBy,
+  limit,
+  onSnapshot,
+  serverTimestamp,
+  Timestamp,
+  updateDoc,
+  deleteDoc,
+  doc
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAzl-3ak-UhQZj-80RcUXMJwF22m9sDevo",
+  authDomain: "chromeportal-e5b55.firebaseapp.com",
+  databaseURL: "https://chromeportal-e5b55-default-rtdb.firebaseio.com",
+  projectId: "chromeportal-e5b55",
+  storageBucket: "chromeportal-e5b55.firebasestorage.app",
+  messagingSenderId: "349440663810",
+  appId: "1:349440663810:web:83331fe134e7568560e21b",
+  measurementId: "G-18FF1S3JWH"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+const chatCollection = collection(db, "class9th_chat");
+
+let currentUser = null;
+let userName = "";
+let unsubscribe = null;
+
+// AUTHENTICATION
+const authReady = new Promise((resolve, reject) => {
+  onAuthStateChanged(auth, async user => {
+    try {
+      if (!user) {
+        await signInAnonymously(auth);
+      } else {
+        currentUser = user;
+        resolve(user);
+      }
+    } catch (error) {
+      reject(error);
+    }
+  }, reject);
+});
+
+authReady.catch(error => {
+  document.getElementById("status").textContent =
+    "Authentication error: " + error.message;
+});
+
+// JOIN CHAT
+window.joinChat = async function() {
+  const name = document.getElementById("nameInput")
+    .value.trim();
+
+  if (!name) {
+    alert("Please enter your name.");
+    return;
+  }
+
+  const btn = document.getElementById("joinBtn");
+  btn.disabled = true;
+  btn.textContent = "Connecting...";
+
+  try {
+    await authReady;
+
+    userName = name;
+
+    document.getElementById("welcome").textContent =
+      "Hello, " + userName;
+
+    document.getElementById("joinPage").style.display = "none";
+    document.getElementById("chatPage").style.display = "block";
+
+    loadMessages();
+
+  } catch(error) {
+    alert("Could not connect: " + error.message);
+    btn.disabled = false;
+    btn.textContent = "Start Chatting";
+  }
+};
+
+// CHANGE NAME
+window.changeName = function() {
+  const newName = prompt("Enter your new name:", userName);
+
+  if (!newName || !newName.trim()) return;
+
+  userName = newName.trim().slice(0, 30);
+
+  document.getElementById("welcome").textContent =
+    "Hello, " + userName;
+
+  alert("Name changed. This applies to new messages.");
+};
+
+// SEND MESSAGE
+window.sendMessage = async function() {
+  const input = document.getElementById("messageInput");
+  const text = input.value.trim();
+
+  if (!text || !currentUser) return;
+
+  const btn = document.getElementById("sendBtn");
+  btn.disabled = true;
+
+  try {
+    const hours = Number(
+      document.getElementById("expirySelect").value
+    );
+
+    const expiresAt = Timestamp.fromDate(
+      new Date(Date.now() + hours * 60 * 60 * 1000)
+    );
+
+    await addDoc(chatCollection, {
+      uid: currentUser.uid,
+      name: userName,
+      message: text,
+      createdAt: serverTimestamp(),
+      expiresAt: expiresAt
+    });
+
+    input.value = "";
+
+  } catch(error) {
+    alert("Message failed: " + error.message);
+  }
+
+  btn.disabled = false;
+  input.focus();
+};
+
+// LOAD LIVE MESSAGES
+function loadMessages() {
+
+  if (unsubscribe) unsubscribe();
+
+  const q = query(
+    chatCollection,
+    where("expiresAt", ">", Timestamp.now()),
+    orderBy("expiresAt", "asc"),
+    limit(100)
+  );
+
+  unsubscribe = onSnapshot(q, snapshot => {
+
+    const container = document.getElementById("messages");
+    container.innerHTML = "";
+
+    const messages = snapshot.docs
+      .map(item => ({ id: item.id, ...item.data() }))
+      .filter(item =>
+        item.expiresAt &&
+        item.expiresAt.toMillis() > Date.now()
+      )
+      .sort((a, b) =>
+        (a.createdAt?.toMillis() || 0) -
+        (b.createdAt?.toMillis() || 0)
+      );
+
+    if (messages.length === 0) {
+      container.innerHTML =
+        '<p class="status">No messages yet. Say hello!</p>';
+      return;
+    }
+
+    messages.forEach(item => {
+
+      const own = item.uid === currentUser.uid;
+
+      const box = document.createElement("div");
+      box.className = "message" + (own ? " own" : "");
+
+      const name = document.createElement("div");
+      name.className = "msgName";
+      name.textContent = item.name || "Unknown";
+
+      const message = document.createElement("div");
+      message.className = "msgText";
+      message.textContent = item.message;
+
+      const time = document.createElement("div");
+      time.className = "msgTime";
+
+      const date = item.createdAt?.toDate();
+
+      time.textContent = date
+        ? date.toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit"
+          })
+        : "Just now";
+
+      box.append(name, message, time);
+
+      // OWN MESSAGE CONTROLS
+      if (own) {
+        const actions = document.createElement("div");
+        actions.className = "actions";
+
+        const edit = document.createElement("button");
+        edit.textContent = "Edit";
+
+        edit.onclick = () => editMessage(item);
+
+        const remove = document.createElement("button");
+        remove.textContent = "Delete";
+        remove.className = "delete";
+
+        remove.onclick = () => deleteMessage(item.id);
+
+        actions.append(edit, remove);
+        box.appendChild(actions);
+      }
+
+      container.appendChild(box);
+    });
+
+    container.scrollTop = container.scrollHeight;
+
+  }, error => {
+    document.getElementById("status").textContent =
+      "Chat error: " + error.message;
+  });
+}
+
+// EDIT MESSAGE
+async function editMessage(item) {
+
+  if (item.uid !== currentUser.uid) return;
+
+  const updated = prompt("Edit your message:", item.message);
+
+  if (updated === null) return;
+
+  const text = updated.trim();
+
+  if (!text || text.length > 2000) {
+    alert("Message must contain 1–2000 characters.");
+    return;
+  }
+
+  try {
+    await updateDoc(
+      doc(db, "class9th_chat", item.id),
+      { message: text }
+    );
+  } catch(error) {
+    alert("Edit failed: " + error.message);
+  }
+}
+
+// DELETE MESSAGE
+async function deleteMessage(id) {
+
+  if (!confirm("Delete your message?")) return;
+
+  try {
+    const messageRef = doc(db, "class9th_chat", id);
+    await deleteDoc(messageRef);
+  } catch(error) {
+    alert("Delete failed: " + error.message);
+  }
+}
+
+// ENTER TO SEND
+document.getElementById("messageInput")
+  .addEventListener("keydown", event => {
+    if (event.key === "Enter") {
+      sendMessage();
+    }
+  });
+
+document.getElementById("nameInput")
+  .addEventListener("keydown", event => {
+    if (event.key === "Enter") {
+      joinChat();
+    }
+  });
+
+</script>
+
+</body>
+</html>
